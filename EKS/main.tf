@@ -201,7 +201,7 @@ module "damola_eks" {
 
   aws_auth_users = [
     {
-      userarn  = "arn:aws:iam::xxx:user/devops@worldbaytech.com"
+      userarn  = "arn:aws:iam::xxx:user/devops@damola.com"
       username = ""
       groups   = ["system:masters"]
     }
