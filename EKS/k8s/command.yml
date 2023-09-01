@@ -1,0 +1,52 @@
+kubectl get node
+aws eks update-kubeconfig --region eu-west-1 --name damola-prod --kubeconfig ~/.kube/config/config --profile basq
+export KUBECONFIG=~/.kube/grocedy-config/config 
+kubectl get Issuers,ClusterIssuers,Certificates,CertificateRequests,Orders,Challenges --all-namespaces
+kubectl get secrets  
+kubectl get logs
+kubectl get ingress -A
+
+
+kubectl get secrets -n staging blah --output=yaml > secrett.yaml 
+kubectl get configmap config -n staging --output=yaml > configmap.yaml
+
+
+
+ kubectl rollout restart deployment -n karpenter karpenter
+ kubectl get pod -n karpenter  
+ kubectl logs karpenter-56d74c6d8f-dv4tk  -n karpenter  
+
+ kubectl scale deployment webclient --replicas=2 -n staging
+ kubectl patch cronjob web -n staging -p '{"spec":{"suspend":true}}'
+
+ helm upgrade --install --namespace karpenter --create-namespace -f karpenter-aws/values.yaml karpenter ./karpenter-aws
+ helm dependency update .       
+
+ aws eks describe-cluster --name damola-prod --profile basq --region eu-west-1 --query 'cluster.endpoint' 
+
+### metrics for kubectl top command 
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+
+
+#  module "karpenter_irsa" {
+#   source                             = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+#   role_name                          = "karpenter-controller-${var.eks-cluster-name}"
+#   attach_karpenter_controller_policy = true
+#   karpenter_controller_cluster_ids   = [module.eks.cluster_id]
+
+#   karpenter_controller_node_iam_role_arns = [
+#     module.eks.eks_managed_node_groups["default"].iam_role_arn
+
+#   ]
+#   oidc_providers = {
+#     main = {
+#       provider_arn               = module.eks.oidc_provider_arn
+#       namespace_service_accounts = ["karpenter:karpenter"]
+#     }
+#   }
+#   tags = {
+#     "Name"        = "karpenter-irsa-${var.eks-cluster-name}"
+#     "Environment" = var.environment
+#     "Terraform"   = "true"
+#   }
+# }

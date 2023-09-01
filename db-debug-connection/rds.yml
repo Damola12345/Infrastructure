@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sql-server-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sql-server-test
+  template:
+    metadata:
+      labels:
+        app: sql-server-test
+    spec:
+      containers:
+        # - name: sql-server
+        #   image: mcr.microsoft.com/mssql/server:2019-latest
+        #   ports:
+        #     - containerPort: 1433
+        - name: sql-tools
+          image: mcr.microsoft.com/mssql-tools
+          command: [ "sleep", "infinity" ]
+          # env:
+          #   - name: MSSQL_SA_PASSWORD
+          #     value: "MyP@ssw0rd" # Replace with the SA password
+          #   - name: ACCEPT_EULA
+          #     value: "Y"
+
+
+
+# command 
+# sqlcmd -S xxxx-dev.xxxxxx.eu-west-1.rds.amazonaws.com -U damola -P xxxxxxxxx -Q "SELECT @@VERSION"
+
