@@ -1,7 +1,7 @@
 # Redis, mysql , sql server command 
 
 - The command creates a temporary Kubernetes pod running the MySQL 8.0 image and opens an interactive Bash shell inside it. This allows you to run commands and interact with the pod's environment. Once you exit the shell, the pod is automatically deleted.
-`kubectl run mysql-client --image=mysql:8.0 -it --rm --restart=Never -- /bin/bash`
+    - `kubectl run mysql-client --image=mysql:8.0 -it --rm --restart=Never -- /bin/bash`
 
 - Once inside the pod, you should be able to run the `msql` command to connect to your msql
     - `mysql -h dev.xxxxx.us-east-1.rds.amazonaws.com -u damola -P 3306  -p `
