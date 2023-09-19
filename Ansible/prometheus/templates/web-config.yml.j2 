@@ -1,0 +1,6 @@
+# TLS and basic authentication configuration example.
+
+# Usernames and passwords required to connect to Prometheus.
+
+basic_auth_users:
+  blockops-sre: "{{ prometheus_basic_auth_password }}"

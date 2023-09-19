@@ -1,0 +1,58 @@
+---
+- name: Install systemd unit file
+  template:
+    src: "loki.systemd.j2"
+    dest: "/etc/systemd/system/loki.service"
+    mode: "0644"
+  notify: restart loki
+  when: ansible_distribution in ['Ubuntu', 'Debian', 'CentOS', 'RedHat', 'Fedora', 'SUSE']
+
+- name: Create config dir for Loki
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  with_items:
+    - "{{ loki_config_directory }}"
+    - "{{ loki_config_store }}"
+
+- name: Set permissions for Loki directory
+  become: true
+  file:
+    path: /var/lib/loki
+    state: directory
+    mode: "0755"
+
+- name: Copy config file for Loki
+  template:
+    src: "loki.yml.j2"
+    dest: "/etc/loki/loki.yml"
+    mode: "0644"
+  notify: restart loki
+
+- name: Download & install Loki binary
+  block:
+    - name: Download Loki binary
+      get_url:
+        url: "https://github.com/grafana/loki/releases/download/v{{ loki_version }}/loki-linux-amd64.zip"
+        dest: "/tmp/loki.zip"
+      register: download_result
+      until: download_result is succeeded
+      retries: 5
+      delay: 2
+
+    - name: unarchive Loki binary
+      unarchive:
+        src: "/tmp/loki.zip"
+        dest: "/usr/local/bin"
+        remote_src: yes
+        creates: "/usr/local/bin/loki"
+
+  when: "'loki' not in ansible_local or loki_version != ansible_local.loki.loki_version"
+
+- name: remove downloaded files
+  file:
+    path: "/tmp/{{ item }}"
+    state: absent
+  with_items:
+    - "loki.zip"
