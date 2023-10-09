@@ -1,0 +1,56 @@
+---
+- name: Install systemd unit file for Promtail
+  template:
+    src: "promtail-systemd.j2"
+    dest: "/etc/systemd/system/promtail.service"
+    mode: "0644"
+  notify: restart promtail
+  when: ansible_distribution in ['Ubuntu', 'Debian', 'CentOS', 'RedHat', 'Fedora', 'SUSE']
+
+
+- name: Create config dir for Promtail
+  file:
+    path: "{{ promtail_config_directory }}"
+    state: directory
+    mode: "0755"
+
+
+- name: Copy config file for Promtail
+  template:
+    src: "promtail.yml.j2"
+    dest: "{{ promtail_config_directory }}/promtail.yml"
+    mode: "0644"
+  notify: restart promtail
+
+- name: Download & install Promtail binary
+  block:
+    - name: Download Promtail binary
+      get_url:
+        url: "https://github.com/grafana/loki/releases/download/v{{ promtail_version }}/promtail-linux-amd64.zip"
+        dest: "/tmp/promtail.zip"
+      register: download_result
+      until: download_result is succeeded
+      retries: 5
+      delay: 2
+
+    - name: unarchive Promtail binary
+      unarchive:
+        src: "/tmp/promtail.zip"
+        dest: "/usr/local/bin"
+        remote_src: yes
+        creates: "/usr/local/bin/promtail"
+
+  when: "'promtail' not in ansible_local or promtail_version != ansible_local.promtail.promtail_version"
+
+- name: remove downloaded files
+  file:
+    path: "/tmp/{{ item }}"
+    state: absent
+  with_items:
+    - "promtail.zip"
+
+
+
+
+
+# tasks file for promtail

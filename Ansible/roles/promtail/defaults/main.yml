@@ -1,0 +1,10 @@
+---
+promtail_version: "2.3.0"
+promtail_config_directory: "/etc/promtail"
+# promtail_log_level: info
+# promtail_grpc_port: 0 
+# promtail_http_port: 9080
+# loki_url: "http://localhost:3100/loki/api/v1/push"
+
+
+# defaults file for promtail
