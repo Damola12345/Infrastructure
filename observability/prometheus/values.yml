@@ -37,21 +37,6 @@ prometheus:
             - targets:
                 - localhost:9090
         
-        - job_name: 'blackbox-external-targets'
-          metrics_path: /probe
-          params:
-            module: [http_2xx]
-          static_configs:
-            - targets:
-                - blackbox-exporter-prometheus-blackbox-exporter.monitoring.svc.cluster.local:9115
-          relabel_configs:
-            - source_labels: [__address__]
-              target_label: __param_target
-            - source_labels: [__param_target]
-              target_label: instance
-            - target_label: __address__
-              replacement: blackbox-exporter-prometheus-blackbox-exporter.monitoring.svc.cluster.local:9115
-        
         - job_name: "kubernetes-nodes-cadvisor"
           scrape_timeout: 60s
           scheme: https
@@ -158,6 +143,47 @@ prometheus:
             - source_labels: [__meta_kubernetes_ingress_name]
               target_label: ingress_name
 
+        - job_name: 'blackbox-external-targets'
+          metrics_path: /probe
+          params:
+            module: [http_2xx]
+          static_configs:
+            - targets:
+                - blackbox-exporter-prometheus-blackbox-exporter.monitoring.svc.cluster.local:9115
+          relabel_configs:
+            - source_labels: [__address__]
+              target_label: __param_target
+            - source_labels: [__param_target]
+              target_label: instance
+            - target_label: __address__
+              replacement: blackbox-exporter-prometheus-blackbox-exporter.monitoring.svc.cluster.local:9115
+
+        - job_name: "blackbox-kubernetes-pods"
+          metrics_path: /probe
+          params:
+            module: [http_2xx]
+          kubernetes_sd_configs:
+          - role: pod
+          relabel_configs:
+          # Example relabel to scrape only pods that have
+          # "example.io/should_be_scraped = true" annotation.
+          #  - source_labels: [__meta_kubernetes_pod_annotation_example_io_should_be_scraped]
+          #    action: keep
+          #    regex: true
+            - source_labels: [__address__]
+              target_label: __param_target
+            - target_label: __address__
+              replacement:  blackbox-exporter-prometheus-blackbox-exporter.monitoring.svc.cluster.local:9115
+            - source_labels: [__param_target]
+              replacement: ${1}/health
+              target_label: instance
+            - action: labelmap
+              regex: __meta_kubernetes_pod_label_(.+)
+            - source_labels: [__meta_kubernetes_namespace]
+              target_label: kubernetes_namespace
+            - source_labels: [__meta_kubernetes_pod_name]
+              target_label: kubernetes_pod_name
+
 
 
         - job_name: 'kubernetes-service-endpoints'
@@ -198,32 +224,6 @@ prometheus:
             - source_labels: [__meta_kubernetes_pod_node_name]
               action: replace
               target_label: node
-
-            - job_name: "blackbox-kubernetes-pods"
-              metrics_path: /probe
-              params:
-                module: [http_2xx]
-              kubernetes_sd_configs:
-              - role: pod
-              relabel_configs:
-              # Example relabel to scrape only pods that have
-              # "example.io/should_be_scraped = true" annotation.
-              #  - source_labels: [__meta_kubernetes_pod_annotation_example_io_should_be_scraped]
-              #    action: keep
-              #    regex: true
-                - source_labels: [__address__]
-                  target_label: __param_target
-                - target_label: __address__
-                  replacement:  blackbox-exporter-prometheus-blackbox-exporter.monitoring.svc.cluster.local:9115
-                - source_labels: [__param_target]
-                  replacement: ${1}/health
-                  target_label: instance
-                - action: labelmap
-                  regex: __meta_kubernetes_pod_label_(.+)
-                - source_labels: [__meta_kubernetes_namespace]
-                  target_label: kubernetes_namespace
-                - source_labels: [__meta_kubernetes_pod_name]
-                  target_label: kubernetes_pod_name
 
 
         - job_name: "kubernetes-pods"
