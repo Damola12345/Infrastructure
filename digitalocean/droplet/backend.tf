@@ -1,4 +1,4 @@
-# Backend to store state file
+# Backend to store tf state file
 
 terraform {
   required_version = ">= 0.13.0"
