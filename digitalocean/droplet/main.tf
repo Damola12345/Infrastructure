@@ -38,7 +38,7 @@ resource "digitalocean_firewall" "testcloud" {
 
   inbound_rule {
     protocol         = "tcp"
-    port_range       = "8080"
+    port_range       = "8000"
     source_addresses = ["", "::/0"]
   }
 
