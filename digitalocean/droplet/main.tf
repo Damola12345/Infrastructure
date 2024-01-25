@@ -13,7 +13,7 @@ provider "digitalocean" {
   token = ""
 }
 
-# Create a new Web Droplet in the fra1 region
+# Create a Droplet in the fra1 region
 resource "digitalocean_droplet" "vm" {
   image    = "ubuntu-22-04-x64"
   name     = "dam-dev-vm"
