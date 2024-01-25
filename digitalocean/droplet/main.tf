@@ -3,7 +3,7 @@
 # Create a Vpc in the fra1 region
 module "vpc" {
   source      = "terraform-do-modules/vpc/digitalocean"
-  name        = "dam"
+  name        = "dam-vpc"
   environment = "dev"
   region      = "fra1"
   ip_range    = "10.10.0.0/16"
