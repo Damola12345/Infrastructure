@@ -5,7 +5,7 @@ terraform {
   backend "s3" {
     endpoint                    = "fra1.digitaloceanspaces.com"
     region                      = "fra1"
-    bucket                      = "dam-terraform-state"
+    bucket                      = "dam-vm-terraform-state"
     key                         = "dam-vpc"
     access_key                  = ""
     secret_key                  = ""
